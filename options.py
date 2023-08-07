@@ -6,7 +6,9 @@ import argparse
 class options():
     def __init__(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--dataset', type=str, help = 'dataset name')
+        parser.add_argument('--taps_disabled', action='store_true')
+        parser.add_argument('--train_dataset', type=str, help = 'train dataset name')
+        parser.add_argument('--val_dataset', type=str, help = 'val dataset name')
         parser.add_argument('--lam', default=1, type = float, help = 'sparsity factor')
         parser.add_argument('--warmup_epochs', default=2, type = float, help = 'Number of epochs before regularizing')
         parser.add_argument('--score_lr', default=.01, type = float, help = '')
@@ -27,14 +29,16 @@ class options():
         parser.add_argument('--wd', type = float, default=0)
         parser.add_argument('--gpu', type = int, default=0)
         parser.add_argument('--save-frequency', type = int, default=10)
-        parser.add_argument('--result_path', type = str, default='')
+        parser.add_argument('--result_path', type = str, default='results/')
         parser.add_argument('--model_path', type = str, default='')
         parser.add_argument('--experiment_name', type = str, default='')
         parser.add_argument('--resize', type = int, default=256)
         parser.add_argument('--input_size', type = int, default=224)
         parser.add_argument('--data-aug', type = str, default='rrcrop')
         parser.add_argument('--model_type', type = str, default='resnet34')
-        parser.add_argument('--cropped', action = 'store_true')
+        parser.add_argument('--cropped', action = 'store_true'),
+        parser.add_argument('--dataset_frac', type=float, default=1.0),
+        
         args = parser.parse_args()
         self.args = args
 

@@ -27,6 +27,21 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
 
+def accuracy(output, target, topk=(1,)):
+    with torch.no_grad():
+        maxk = max(topk)
+        batch_size = target.size(0)
+
+        _, pred = output.topk(maxk, 1, True, True)
+        pred = pred.t()
+        correct = pred.eq(target.view(1, -1).expand_as(pred))
+
+        res = []
+        for k in topk:
+            correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+            res.append(correct_k.mul_(100.0 / batch_size))
+        return res
+    
 def select_layers(model, train_layers):
     all_layers = [b for a, b in model.named_modules() if (isinstance(b, nn.Sequential) and len(a.split('.')) == split_counter)]
     num_layers = len(all_layers)
@@ -50,15 +65,15 @@ def get_pretrained_weights(model_type):
         model = torchvision.models.resnet101(pretrained = True)
         torch.save(model.state_dict(), str(model_type) + '.pth')
 
-def load_model(model_type):
+def load_model(model_type, taps_disabled=True):
     if model_type == 'vit':
         model = timm.create_model('vit_base_patch16_224', pretrained=True, num_classes= num_classes)
     elif model_type == 'resnet34':
-        model = resnet34()
+        model = resnet34() if not taps_disabled else torchvision.models.resnet34()
     elif model_type == 'resnet50':
-        model = resnet50()
+        model = resnet50() if not taps_disabled else torchvision.models.resnet50()
     elif model_type == 'resnet101':
-        model = resnet101()
+        model = resnet101() if not taps_disabled else torchvision.models.resnet101()
     else:
         raise Exception('Model type, {}, not an available option. Ending Training run.').format(model_type)
     return model
