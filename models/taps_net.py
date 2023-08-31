@@ -245,12 +245,18 @@ class ResNet(nn.Module):
                                 norm_layer=norm_layer))
 
         return nn.Sequential(*layers)
+
     def getIndicators(self):
         indicators = []
         for i in self.named_parameters():
             if 'indicator' in i[0]:
                 indicators.append(i[1])
         return indicators
+    
+    def getIndicatorLayers(self):
+        """ Returns the names of each of the layers that has an indicator """
+        indicators = {i[0] : i[1] for i in self.named_parameters() if 'indicator' in i[0]}
+        return [key.split('.indicator')[0] for key in indicators.keys()]
 
     def _forward_impl(self, x):
         # See note [TorchScript super()]

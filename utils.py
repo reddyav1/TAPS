@@ -98,30 +98,58 @@ def create_transforms(opts):
     else:
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-    if opts.args.cropped:
-        test_transform = transforms.Compose([
-            transforms.Resize([224,224]),
+    if opts.args.small:
+        if opts.args.cropped:
+            test_transform = transforms.Compose([
+                transforms.Resize([72,72]),
+                transforms.ToTensor(),
+                normalize,
+            ])
+            train_transform = transforms.Compose([
+                transforms.Resize([72,72]),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        else: 
+            test_transform = transforms.Compose([
+            transforms.Resize(72),
+            transforms.CenterCrop(72),
             transforms.ToTensor(),
             normalize,
-        ])
-        train_transform = transforms.Compose([
-            transforms.Resize([224,224]),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            normalize,
-        ])
-    else: 
-        test_transform = transforms.Compose([
-        transforms.Resize(224),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        normalize,
-        ])
+            ])
 
-        train_transform = transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
+            train_transform = transforms.Compose([
+                transforms.RandomResizedCrop(72),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ])
+    else:
+        if opts.args.cropped:
+            test_transform = transforms.Compose([
+                transforms.Resize([224,224]),
+                transforms.ToTensor(),
+                normalize,
+            ])
+            train_transform = transforms.Compose([
+                transforms.Resize([224,224]),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        else: 
+            test_transform = transforms.Compose([
+            transforms.Resize(224),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
             normalize,
-        ])
+            ])
+
+            train_transform = transforms.Compose([
+                transforms.RandomResizedCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ])
     return train_transform, test_transform
